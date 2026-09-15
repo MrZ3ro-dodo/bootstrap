@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Backrooms — Layout</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root{--wall:#efe07a;--floor:#bfbf6b;--accent:#b08a00;--muted:#6b6b42}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(#f7f2b0 0%, #efe07a 40%, #e3d97a 100%);font-family:'Share Tech Mono',monospace;color:#222}
+    .ceiling{background:repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0 2px, transparent 2px 12px);box-shadow:inset 0 0 80px rgba(0,0,0,0.08)}
+    .carpet{background:linear-gradient(180deg,#d6d686 0%,#bfbf6b 100%);border:1px solid rgba(0,0,0,0.06)}
+    /* Navbar */
+    .site-nav{background:var(--wall);border-bottom:1px solid rgba(0,0,0,0.06)}
+    .navbar-brand{font-family:'VT323',monospace;color:#1a1a00;font-weight:700}
+    .nav-link{color:#1a1a00}
+    .nav-link:hover{opacity:0.85}
+    .navbar-toggler{border-color:rgba(0,0,0,0.06)}
+    .grain{position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(circle at 10% 10%,rgba(0,0,0,0.02),transparent 10%);mix-blend-mode:multiply;opacity:0.18}
+    .jumbotron{background:linear-gradient(180deg,rgba(255,255,255,0.22),rgba(0,0,0,0.02));border:2px solid rgba(0,0,0,0.06);padding:3rem;border-radius:.25rem}
+    .hero-title{font-family:'VT323',monospace;font-size:3.2rem;color:#2b2b00;letter-spacing:2px;text-shadow:0 2px 0 rgba(255,255,255,0.6)}
+    .panel{background:rgba(255,255,255,0.14);border:1px solid rgba(0,0,0,0.05);padding:1.2rem;border-radius:.25rem;min-height:140px}
+    .small-gallery img{height:44px;object-fit:cover;border-radius:4px;cursor:pointer;border:1px solid rgba(0,0,0,0.06)}
+    .mob-thumb{height:44px;object-fit:cover;border-radius:4px;border:1px solid rgba(0,0,0,0.06)}
+    .btn-outline-warning{border-color:rgba(0,0,0,0.08);color:#1a1a00}
+    footer{color:rgba(0,0,0,0.6);padding:2rem 0;text-align:center}
+    @media(min-width:768px){.hero-title{font-size:4.2rem}}
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light site-nav">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img id="brandImg" src="" alt="" style="height:44px;object-fit:contain;margin-right:.5rem;display:none">
+        <span id="brandText">BACKROOMS</span>
+      </a>
+      <form class="d-flex ms-3 me-auto" onsubmit="return false;">
+        <input id="modSearch" class="form-control form-control-sm me-2" type="search" placeholder="Pesquisar mod (ex: places)" aria-label="Pesquisar">
+        <button id="searchBtn" class="btn btn-sm btn-primary" type="button">Pesquisar</button>
+      </form>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Levels</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Map</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container"><div id="searchResults" class="my-3"></div></div>
+  <div class="grain"></div>
+  <div class="container py-4">
+    <div id="modDetailPanel" class="row mb-3" style="display:none">
+      <div class="col-12">
+        <div class="panel" id="modDetail">
+          <h3 id="modTitle"></h3>
+          <p id="modDesc" class="text-muted"></p>
+          <div id="modImages" class="d-flex gap-2 flex-wrap mb-2"></div>
+          <div class="mb-2"><strong>Versões (filtradas: 1.21.1 + forge)</strong><div id="modVersions"></div></div>
+                <div class="mb-2">
+                  <strong>Mob Informations</strong>
+                  <div id="mobList" class="mb-2"></div>
+                  <button id="addMob" class="btn btn-sm btn-outline-secondary">Adicionar mob</button>
+                </div>
+          <div class="d-flex gap-2">
+            <button id="exportJson" class="btn btn-sm btn-success">Exportar JSON</button>
+            <button id="copyLink" class="btn btn-sm btn-warning">Copiar link compartilhável</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- jumbotron removed per request; mod info appears in navbar and panels -->
+
+    <div class="row mb-4">
+      <div class="col-md-6 mb-3">
+        <div class="panel carpet" id="corridorLogs">
+          <h3 class="card-title">Corridor Logs</h3>
+          <p class="text-muted">Notas curtas, pistas encontradas e pontos de interesse.</p>
+        </div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <div class="panel carpet" id="mapFragment">
+          <h3 class="card-title">Map Fragment</h3>
+          <p class="text-muted">Mapa parcial, setas e locais de referência.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-4 mb-3">
+        <div class="panel">
+          <h4 id="level0Title" class="card-title">Level 0</h4>
+          <p id="level0Desc" class="text-muted">Descrição breve do nível inicial.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="panel">
+          <h4 class="card-title">Level 1</h4>
+          <p class="text-muted">Áreas mais raras e perigosas.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="panel">
+          <h4 class="card-title">Anomalias</h4>
+          <p class="text-muted">Fragmentos e rupturas na geometria.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-8 mb-3">
+        <div class="panel" id="areaMain">
+          <h4 class="card-title">Área principal</h4>
+          <p class="text-muted">Narrativa, imagens de referência e o diário do explorador.</p>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="panel" id="quickMenu">
+          <h4 class="card-title">Quick Menu</h4>
+          <p class="text-muted">Controles, sinalizadores e atalhos para fuga.</p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <small>Tema inspirado nas Backrooms — corredores amarelados e lâmpadas zumbindo.</small>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Helpers
+    const qs = (s) => document.querySelector(s);
+    const apiBase = 'https://api.modrinth.com/v2';
+
+    function b64encode(obj){return btoa(unescape(encodeURIComponent(JSON.stringify(obj))))}
+    function b64decode(str){return JSON.parse(decodeURIComponent(escape(atob(str))))}
+
+    // Helpers: sanitize description (remove image markdown/HTML)
+    function sanitizeDescription(text){
+      if(!text) return '';
+      // remove markdown images ![alt](url)
+      let t = text.replace(/!\[[^\]]*\]\([^\)]+\)/g,'');
+      // remove HTML img tags
+      t = t.replace(/<img[^>]*>/gi,'');
+      // strip excessive HTML tags but keep basic formatting
+      t = t.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi,'');
+      // collapse multiple newlines
+      t = t.replace(/\r/g,'').replace(/\n{2,}/g,'\n\n');
+      // convert remaining newlines to <br>
+      return t.replace(/\n/g,'<br>');
+    }
+
+    // Search
+    qs('#searchBtn').addEventListener('click', async ()=>{
+      const q = qs('#modSearch').value.trim();
+      if(!q) return;
+      qs('#searchResults').innerHTML = 'Buscando...';
+      try{
+        const res = await fetch(`${apiBase}/search?query=${encodeURIComponent(q)}&index=projects`);
+        const data = await res.json();
+        if(!data.hits || data.hits.length===0){ qs('#searchResults').innerText='Nenhum resultado.'; return }
+        qs('#searchResults').innerHTML = data.hits.slice(0,6).map(h=>`<div class="result-item p-2" data-slug="${h.project_id}"><strong>${h.title}</strong> — ${h.short_description||''}</div>`).join('');
+        document.querySelectorAll('.result-item').forEach(el=>el.addEventListener('click', ()=>loadProject(el.getAttribute('data-slug'))));
+      }catch(e){qs('#searchResults').innerText='Erro na busca'}
+    });
+
+    // Load project by id or slug
+    async function loadProject(id){
+      qs('#searchResults').innerHTML='Carregando...';
+      try{
+        const p = await (await fetch(`${apiBase}/project/${id}`)).json();
+        qs('#modTitle').innerText = p.title + ' ('+p.slug+')';
+        // set brand image and text to mod icon/title, ensure not cut off
+        const brandImg = document.getElementById('brandImg');
+        const brandText = document.getElementById('brandText');
+        if(p.icon_url){ brandImg.src = p.icon_url; brandImg.style.display='inline-block'; brandText.style.display='inline-block'; }
+        else { brandImg.style.display='none'; brandText.style.display='inline-block'; }
+        brandText.innerText = p.title || 'BACKROOMS';
+        qs('#modDesc').innerHTML = sanitizeDescription(p.description || p.short_description || '');
+        // images
+        const imgs = [];
+        if(p.icon_url) imgs.push(p.icon_url);
+        if(p.gallery) p.gallery.forEach(u=>imgs.push(u.url));
+        qs('#modImages').innerHTML = imgs.map(u=>`<img src="${u}" alt="img" style="height:80px;object-fit:cover;border-radius:4px"/>`).join('');
+        // versions
+        const versions = await (await fetch(`${apiBase}/project/${p.id}/version`)).json();
+        const filtered = versions.filter(v=>v.game_versions && v.game_versions.includes('1.21.1') && v.loaders && v.loaders.includes('forge'));
+        qs('#modVersions').innerHTML = filtered.length? filtered.map(v=>`<div>${v.name||v.version_number} — ${v.files.map(f=>f.filename).join(', ')}</div>`).join('') : '<div class="text-muted">Nenhuma versão filtrada encontrada.</div>';
+        // prepare mob list empty
+        qs('#mobList').innerHTML = '';
+        currentMod = {id:p.id,slug:p.slug,title:p.title,description:p.description,images:imgs,versions:filtered};
+        // Se for o mod 'places', aplicar conteúdo e mobs curados para Level 0
+        if(p.slug && p.slug.toLowerCase().includes('places')){
+          currentMod.mobs = [
+            {name:'Wandering Host', image:'', dimensions:'Level 0', desc:'Entidade errante que causa desorientação; evite olhar diretamente.'},
+            {name:'Flicker', image:'', dimensions:'Level 0', desc:'Pequena anomalia luminosa próxima às lâmpadas fluorescentes.'}
+          ];
+          // Atualizar descrição do Level 0 para combinar com "Places"
+          if(document.getElementById('level0Title')) document.getElementById('level0Title').innerText = 'Level 0 — Places (The Lobby)';
+          if(document.getElementById('level0Desc')) document.getElementById('level0Desc').innerText = 'Corredores intermináveis com papel de parede amarelado, carpete úmido e iluminação fluorescente que zumbem. Desorientação e loops espaciais são comuns.';
+        }
+        renderMobs();
+        // populate page panels with project data
+        lastProject = p;
+        populatePanels(currentMod, p);
+        qs('#modDetailPanel').style.display='block';
+        qs('#searchResults').innerHTML = '';
+      }catch(e){qs('#searchResults').innerText='Erro ao carregar projeto';console.error(e)}
+    }
+
+    let lastProject = null;
+    function populatePanels(mod, proj){
+      // Corridor Logs: use short description or description
+      const corridor = document.getElementById('corridorLogs');
+      if(corridor){
+        const text = (proj && (proj.short_description||proj.description)) || (mod && mod.description) || '';
+        corridor.innerHTML = `<h3 class="card-title">Corridor Logs</h3><p class="text-muted">${text}</p>`;
+      }
+      // Map Fragment: use gallery images
+      const mapF = document.getElementById('mapFragment');
+      if(mapF){
+        const imgs = (mod && mod.images) || [];
+        mapF.innerHTML = `<h3 class="card-title">Map Fragment</h3>` + (imgs.length? `<div class="d-flex gap-2 flex-wrap small-gallery">${imgs.slice(0,12).map((u,idx)=>`<img src="${u}" data-idx="${idx}" class="mob-thumb"/>`).join('')}</div>` : '<p class="text-muted">Sem imagens.</p>');
+        // add click handlers to thumbnails to assign to selected mob dimension images
+        setTimeout(()=>{
+          document.querySelectorAll('.small-gallery img').forEach(img=>{
+            img.addEventListener('click', ()=>{
+              const idx = img.getAttribute('data-idx');
+              // if a mob field is focused, set its image; otherwise set brand image
+              const focused = document.activeElement;
+              if(focused && focused.name && focused.name.startsWith('mob-') && focused.name.endsWith('img')){
+                const i = focused.getAttribute('data-i');
+                if(currentMod && currentMod.mobs && currentMod.mobs[i]){ currentMod.mobs[i].image = img.src; renderMobs(); }
+              } else {
+                // set brand image if none
+                const brandImg = document.getElementById('brandImg'); brandImg.src = img.src; brandImg.style.display='inline-block';
+              }
+            });
+          });
+        },50);
+      }
+      // Area main: fill with longer description and first image
+      const area = document.getElementById('areaMain');
+      if(area){
+        const first = (mod && mod.images && mod.images[0]) || '';
+        area.innerHTML = `<h4 class="card-title">${mod.title||'Área principal'}</h4><p class="text-muted">${mod.description||''}</p>` + (first? `<img src="${first}" style="width:100%;max-height:220px;object-fit:contain;border-radius:6px;margin-top:.5rem;background:#f4f0c0"/>` : '');
+      }
+      // Quick menu: links
+      const quick = document.getElementById('quickMenu');
+      if(quick){
+        const mr = proj?`https://modrinth.com/project/${proj.slug}`: (mod && mod.slug? `https://modrinth.com/project/${mod.slug}` : '#');
+        quick.innerHTML = `<h4 class="card-title">Quick Menu</h4><p class="text-muted">Ações rápidas</p><div class="d-flex flex-column gap-2"><a class="btn btn-sm btn-outline-primary" target="_blank" href="${mr}">Abrir no Modrinth</a><a class="btn btn-sm btn-outline-secondary" href="#">Abrir galeria</a></div>`;
+      }
+    }
+
+    // Mob editor
+    let currentMod = null;
+    function renderMobs(){
+      const el = qs('#mobList'); el.innerHTML='';
+      (currentMod.mobs||[]).forEach((m,i)=>{
+        const div = document.createElement('div'); div.className='mb-2';
+        div.innerHTML = `<div class="d-flex gap-2 align-items-start">
+               <div style="width:88px;height:64px;flex:0 0 88px;">
+                 <img src="${m.image||''}" class="mob-thumb" style="width:100%;height:64px;object-fit:cover;border-radius:4px;"/>
+               </div>
+               <div style="flex:1">
+                 <input class="form-control form-control-sm mb-1" data-i="${i}" name="mob-name" value="${m.name}" placeholder="Nome"/>
+                 <input class="form-control form-control-sm mb-1" data-i="${i}" name="mob-img" value="${m.image||''}" placeholder="URL da imagem"/>
+                 <input class="form-control form-control-sm mb-1" data-i="${i}" name="mob-dim" value="${m.dimensions||''}" placeholder="Dimensions (ex: Level 0)"/>
+                 <textarea class="form-control form-control-sm mb-1" data-i="${i}" name="mob-desc" placeholder="Descrição">${m.desc||''}</textarea>
+                 <div class="small-gallery mt-1 mb-1">${(currentMod.images||[]).map((u,gi)=>`<img src="${u}" data-idx="${gi}" data-mob="${i}" class="mob-thumb"/>`).join('')}</div>
+                 <div class="d-flex gap-2"><button class="btn btn-sm btn-danger" data-i="${i}">Remover</button><button class="btn btn-sm btn-outline-secondary" data-i="${i}" data-action="choose">Escolher imagem</button></div>
+               </div>
+             </div>`;
+        el.appendChild(div);
+        div.querySelector('button').addEventListener('click', ()=>{ currentMod.mobs.splice(i,1); renderMobs(); });
+        div.querySelector('[name="mob-name"]').addEventListener('input', (e)=> currentMod.mobs[i].name = e.target.value);
+        div.querySelector('[name="mob-img"]').addEventListener('input', (e)=> currentMod.mobs[i].image = e.target.value);
+        div.querySelector('[name="mob-dim"]').addEventListener('input', (e)=> currentMod.mobs[i].dimensions = e.target.value);
+        div.querySelector('[name="mob-desc"]').addEventListener('input', (e)=> currentMod.mobs[i].desc = e.target.value);
+        div.querySelector('[data-action="choose"]').addEventListener('click', ()=>{
+          // focus the mob image input so clicking a gallery image assigns it
+          const input = div.querySelector('[name="mob-img"]'); input.focus();
+        });
+        // gallery click handlers for images within this mob block
+        div.querySelectorAll('.small-gallery img').forEach(imgEl=>{
+          imgEl.addEventListener('click', ()=>{
+            const src = imgEl.src;
+            // assign to this mob
+            currentMod.mobs[i].image = src;
+            // also set dimensions to indicate selection (optional)
+            currentMod.mobs[i].dimensions = currentMod.mobs[i].dimensions || 'Level 0';
+            renderMobs();
+          });
+        });
+      });
+    }
+
+    qs('#addMob').addEventListener('click', ()=>{
+      if(!currentMod) return;
+      currentMod.mobs = currentMod.mobs || [];
+      currentMod.mobs.push({name:'',image:'',dimensions:'',desc:''});
+      renderMobs();
+    });
+
+    // Export / share
+    qs('#exportJson').addEventListener('click', ()=>{
+      if(!currentMod) return alert('Nenhum mod carregado');
+      const data = JSON.stringify(currentMod, null, 2);
+      const blob = new Blob([data], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `${currentMod.slug||'mod'}.json`; a.click(); URL.revokeObjectURL(url);
+    });
+
+    qs('#copyLink').addEventListener('click', ()=>{
+      if(!currentMod) return alert('Nenhum mod carregado');
+      const payload = {mod:currentMod};
+      const s = b64encode(payload);
+      const shareUrl = `${location.origin}${location.pathname}?data=${s}`;
+      navigator.clipboard.writeText(shareUrl).then(()=>alert('Link copiado para área de transferência'));
+    });
+
+    // If page opened with data param, decode and show
+    (function(){
+      const params = new URLSearchParams(location.search);
+      if(params.has('data')){
+        try{
+          const obj = b64decode(params.get('data'));
+          currentMod = obj.mod || obj;
+          qs('#modTitle').innerText = currentMod.title || 'Shared Mod';
+            qs('#modDesc').innerHTML = sanitizeDescription(currentMod.description||'');
+          qs('#modImages').innerHTML = (currentMod.images||[]).map(u=>`<img src="${u}" style="height:80px;object-fit:cover;border-radius:4px"/>`).join('');
+          renderMobs();
+          populatePanels(currentMod, null);
+          qs('#modDetailPanel').style.display='block';
+        }catch(e){console.error(e)}
+      }else{
+        // auto-load popular 'places' project to match request
+        loadProject('places').catch(()=>{/* ignore load errors */});
+      }
+    })();
+
+  </script>
+</body>
+</html>
